@@ -21,12 +21,14 @@ A **LSPosed** module that enhances Samsung Internet Browser (package `com.sec.an
 6. **Streamlined Settings** — master switch + multi-select hiding for unneeded items.
 7. **Block Updates & Red Dots** — block browser updates, clear update notifications / popups / red dots.
 8. **Homepage Video Background** — play a video on the homepage (loop, muted).
-9. **Userscript Manager** — full built-in manager: list / add / save / delete / toggle, `.user.js` interception, source management, "update all", lightweight GM API, detail page + share import.
+9. **Userscript Manager** — full built-in manager: list / add / save / delete / toggle, `.user.js` interception, source management, "update all", lightweight GM API, detail page + share import; scheduled execution via `@crontab` (background scheduler, `once`/`once(expr)` syntax); per-script site exclusion list; menu registration dedupe; hardened `@require`/`@resource` cache and enable-list protection.
 10. **Bookmark Management** — import / export bookmarks (Chrome / Edge / Firefox HTML format), tree checkbox dialog.
 11. **Random UA** — 55 real UA strings with random rotation; supports platform/browser multi-select and custom parameters.
 12. **Media Sniffer & Download Engine** — multi-threaded download engine for m3u8/TVOD streams; sniff and download video/audio/image resources with tab-based select-all (video/audio/image independent). Built-in site parsers for **Bilibili DASH** (auto-pair video+audio into single MP4, 4K/1080P+/HDR), **Douyin / Kuaishou / Xiaohongshu / Weibo / AcFun / Toutiao** (SSR JSON extraction via script tag), and global platforms **YouTube** (itag resolution), **TikTok**, **X/Twitter**, **Instagram/Facebook** (performance CDN). Segmented video (m4s/ts) auto-remux to MP4 — instant, no transcoding bloat. Task progress bar, speed display, cancel support, configurable concurrency.
-13. **Homepage Beautification** — personalize the homepage search box and other elements.
+13. **Homepage Beautification** — personalize the homepage: flip clock, homepage date, clock/date color settings, search box tweaks and more.
 14. **Version + Project URL + Auto Update Check** — version and project URL shown in module home and browser menu, with auto update checking.
+15. **Bookmark AI Smart Organize** — auto-classify bookmarks into a two-level (category / sub-category) system; preview before apply, adjust per category, retry; powered by your own OpenAI-compatible model provider (only bookmark titles and domains are sent).
+16. **AI Model Settings** — manage multiple provider groups (base URL / API key / model list) under Settings → Models; shared by bookmark AI organize and future features.
 
 ### Requirements
 
@@ -139,6 +141,9 @@ hook `SBrowserCommandLine.initialize()`，通过 `TerraceCommandLine.appendSwitc
 - 支持源管理（`@updateURL` / `@downloadURL`）、「更新所有脚本」
 - 内置精简版 GM API（`GM_setValue` / `GM_getValue` / `GM_registerMenuCommand` 等）
 - 脚本详情页 + 分享导入
+- `@crontab` 定时执行（后台调度器自动拉起，`once` / `once(expr)` 语法）
+- 按脚本排除站点（排除列表内不注入）
+- 菜单注册去重、`@require` / `@resource` 本地缓存与启用名单加固
 
 ### 10. 书签管理
 - 导入 / 导出书签（Chrome / Edge / Firefox 通用 HTML 格式）
@@ -158,11 +163,18 @@ hook `SBrowserCommandLine.initialize()`，通过 `TerraceCommandLine.appendSwitc
 - 图片格子选中显示蓝色遮罩
 
 ### 13. 主页美化子菜单
-主页搜索框等页面元素的个性化设置。
+主页搜索框等页面元素的个性化设置：翻页时钟、主页日期、时钟 / 日期颜色设置等。
 
 ### 14. 版本号 + 项目地址 + 自动检测更新
 - SBPlus 应用首页与浏览器 SBPlus 菜单里都显示版本号 + 项目地址
 - 启动/进入页面时自动检测 GitHub 最新 release，有新版本在版本号后提示「点击更新」，点击后确认下载 apk
+
+### 15. 书签 AI 智能整理
+自动把收藏夹按语义分类（大类 / 子类两级体系），先预览确认、可逐类调整后再应用，支持重试。
+由用户自配的 OpenAI 兼容模型服务驱动，仅发送书签标题与域名。
+
+### 16. AI 模型设置
+「设置 → 模型」：多分组管理接口地址 / API Key / 模型列表（OpenAI 兼容接口），书签 AI 整理等功能共用。
 
 ### 构建
 
