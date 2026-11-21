@@ -37,11 +37,19 @@ A **LSPosed** module that enhances Samsung Internet Browser (package `com.sec.an
 3. Set scope to **Samsung Internet** (`com.sec.android.app.sbrowser`) or Beta (`com.sec.android.app.sbrowser.beta`).
 4. Restart the browser (or device).
 
+### No-root Patching (optional)
+
+The module also ships a built-in patcher: it injects the runtime into a stock Samsung Internet APK, re-signs it, and produces an installable APK — no root or LSPosed required.
+
+- Entry: **免 root 打补丁** in the module app.
+- A device-specific signing certificate is generated on first use; the private key is not shipped with the module.
+- Only the original package name is supported.
+
 ### Supported Versions
 
 | Channel | Package | Version |
 |---------|---------|---------|
-| Stable | `com.sec.android.app.sbrowser` | 30.0.0.67, 30.1.0.67 |
+| Stable | `com.sec.android.app.sbrowser` | 30.0.0.67, 30.1.0.67, 31.0.0.64, 31.0.2.39 |
 | Beta | `com.sec.android.app.sbrowser.beta` | 30.0.0.67 |
 
 The module resolves obfuscated class/method names at runtime, so it generally adapts to newer browser versions automatically without a module update.
@@ -50,7 +58,7 @@ The module resolves obfuscated class/method names at runtime, so it generally ad
 
 ```bat
 call <path-to-android-sdk>/env.bat
-gradle assembleDebug --no-daemon
+gradlew.bat assembleDebug --no-daemon
 ```
 
 Output: `app\build\outputs\apk\debug\app-debug.apk`
@@ -71,9 +79,9 @@ Re-resolution happens on every browser start, so after a browser update the modu
 
 ### 框架说明
 
-- **目标框架：LSPosed**（接口兼容标准 Xposed API）
-- 模块入口：`assets/xposed_init` → `com.sbplus.browser.MainHook`
-- 兼容：LSPosed 可加载，老 Xposed / EdXposed 理论上也可加载
+- **目标框架：LSPosed**（基于 LSPosed 新 API `io.github.libxposed.api`，封装传统 Xposed 风格兼容层 `XC_MethodHook`）
+- 模块入口：`resources/META-INF/xposed/java_init.list` → `MainModule` → `MainHook`
+- 架构：`MainModule`（入口）→ `MainHook`（单核巨类，22 个功能隔离注册）+ 30+ 个辅助类
 
 ### 使用前提
 
@@ -85,11 +93,19 @@ Re-resolution happens on every browser start, so after a browser update the modu
 
 > 作用域需要时可在 LSPosed 界面手动勾选。
 
+### 免 root 打补丁（可选）
+
+模块内置补丁器：把运行时注入三星浏览器原始 APK 并重签名，产出可直接安装的完整功能版，无需 root / LSPosed。
+
+- 入口：模块首页「免 root 打补丁」
+- 首次使用会在本机生成独立签名证书，私钥不随模块包分发
+- 只支持原包名模式
+
 ### 支持版本
 
 | 渠道 | 包名 | 版本 |
 |------|------|------|
-| 正式版 | `com.sec.android.app.sbrowser` | 30.0.0.67, 30.1.0.67 |
+| 正式版 | `com.sec.android.app.sbrowser` | 30.0.0.67, 30.1.0.67, 31.0.0.64, 31.0.2.39 |
 | Beta 版 | `com.sec.android.app.sbrowser.beta` | 30.0.0.67 |
 
 模块通过运行时自适应解析混淆类名/方法名，通常浏览器更新后无需更新模块即可自动适配。
@@ -180,7 +196,7 @@ hook `SBrowserCommandLine.initialize()`，通过 `TerraceCommandLine.appendSwitc
 
 ```bat
 call <path-to-android-sdk>\env.bat
-gradle assembleDebug --no-daemon
+gradlew.bat assembleDebug --no-daemon
 ```
 
 产物：`app\build\outputs\apk\debug\app-debug.apk`
